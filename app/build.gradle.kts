@@ -97,4 +97,9 @@ dependencies {
   val paging_version = "3.2.1"
   implementation ("androidx.paging:paging-runtime:$paging_version")
 
+  // rxjava
+  implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")
+
+  implementation ("io.reactivex.rxjava3:rxjava:3.1.5")
+
 }

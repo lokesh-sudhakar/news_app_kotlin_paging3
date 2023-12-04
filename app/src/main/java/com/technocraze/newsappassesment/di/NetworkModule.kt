@@ -1,13 +1,14 @@
 package com.technocraze.newsappassesment.di
 
 import com.technocraze.newsappassesment.BuildConfig
-import com.technocraze.newsappassesment.utils.Constants
 import com.technocraze.newsappassesment.network.AuthenticationInterceptor
 import com.technocraze.newsappassesment.network.NewsApiService
 import com.technocraze.newsappassesment.repository.NewsRepository
 import com.technocraze.newsappassesment.repository.NewsRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
@@ -19,56 +20,64 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+abstract class NetworkModule {
 
-  @Singleton
-  @Provides
-  fun getOkhttpInstance(loggingInterceptor: HttpLoggingInterceptor,
-                        authenticationInterceptor: AuthenticationInterceptor
-                        ): OkHttpClient {
-    return OkHttpClient.Builder()
-      .addInterceptor(authenticationInterceptor)
-      .addInterceptor(loggingInterceptor)
-      .build()
+  companion object {
 
+
+
+    @Provides
+    @Singleton
+    fun getOkhttpInstance(
+      loggingInterceptor: HttpLoggingInterceptor,
+      authenticationInterceptor: AuthenticationInterceptor
+    ): OkHttpClient {
+      return OkHttpClient.Builder()
+        .addInterceptor(authenticationInterceptor)
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    }
+
+
+    @Provides
+    @Singleton
+    fun getAuthInterceptor(): AuthenticationInterceptor {
+      return AuthenticationInterceptor()
+    }
+
+
+    @Provides
+    @Singleton
+    fun getLoggingInterceptor(): HttpLoggingInterceptor {
+      val loggingInterceptor = HttpLoggingInterceptor()
+      loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+      return loggingInterceptor
+    }
+
+
+    @Provides
+    @Singleton
+    fun getRetrofitInstance(client: OkHttpClient): Retrofit {
+      val retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_API_URL)
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+      return retrofit
+    }
+
+    @Provides
+    @Singleton
+    fun getNewsApiService(retrofit: Retrofit): NewsApiService {
+      return retrofit.create(NewsApiService::class.java)
+    }
   }
 
-  @Singleton
-  @Provides
-  fun getAuthInterceptor(): AuthenticationInterceptor {
-    return AuthenticationInterceptor()
-  }
 
-  @Singleton
-  @Provides
-  fun getLoggingInterceptor(): HttpLoggingInterceptor {
-    val loggingInterceptor = HttpLoggingInterceptor()
-    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-    return loggingInterceptor
-  }
-
-  @Singleton
-  @Provides
-  fun getRetrofitInstance(client: OkHttpClient): Retrofit {
-    return Retrofit.Builder()
-      .baseUrl(BuildConfig.BASE_API_URL)
-      .client(client)
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
-  }
-
-  @Provides
-  @Singleton
-  fun getNewsApiService(retrofit: Retrofit): NewsApiService {
-    return retrofit.create(NewsApiService::class.java)
-  }
-
-
-  @Provides
-  @Singleton
-  fun getNewsRepository(newsApiService: NewsApiService): NewsRepository {
-    return NewsRepositoryImpl(newsApiService)
-  }
+  @Binds
+  abstract fun getNewsRepository(newsRepositoryImpl: NewsRepositoryImpl): NewsRepository
 
 
 }

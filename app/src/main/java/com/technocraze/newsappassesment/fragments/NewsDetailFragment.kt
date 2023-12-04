@@ -3,6 +3,7 @@ package com.technocraze.newsappassesment.fragments
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,10 @@ import com.technocraze.newsappassesment.utils.DateUtils
 import com.technocraze.newsappassesment.R
 import com.technocraze.newsappassesment.databinding.FragmentNewsDetailBinding
 import com.technocraze.newsappassesment.model.Article
+import com.technocraze.newsappassesment.repository.Car
 import com.technocraze.newsappassesment.utils.makeHyperLink
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 interface ArticleDetailCallback {
@@ -23,16 +27,21 @@ interface ArticleDetailCallback {
 
 }
 
-
+@AndroidEntryPoint
 class NewsDetailFragment : Fragment() {
 
   private lateinit var binding: FragmentNewsDetailBinding
   private lateinit var articleDetailCallback: ArticleDetailCallback
   private lateinit var article: Article
+  @Inject
+  lateinit var  car: Car
+  @Inject
+  lateinit var  bmw: Car
 
 
   companion object {
     const val ARG_ARTICLE = "article"
+    const val TAG = "Lifecycle"
 
     fun getInstance(article: Article): NewsDetailFragment {
       val bundle = bundleOf().apply {
@@ -47,6 +56,7 @@ class NewsDetailFragment : Fragment() {
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
+    Log.d(TAG, "onAttach: Detail")
     if (context is ArticleDetailCallback) {
       articleDetailCallback = context
     } else {
@@ -54,7 +64,15 @@ class NewsDetailFragment : Fragment() {
     }
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Log.d(TAG, "onCreate: Detail")
+  }
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    Log.d(TAG, "onCreateView: Detail")
+    Log.d(TAG, "NewsDetailFragment:car ${car.getName()}")
+    Log.d(TAG, "NewsDetailFragment:bmw ${bmw.getName()}")
     binding = FragmentNewsDetailBinding.inflate(inflater, container, false)
     extractDataFromArguments()
     return binding.root
@@ -63,6 +81,52 @@ class NewsDetailFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViews()
+    Log.d(TAG, "onViewCreated: Detail")
+  }
+
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    Log.d(TAG, "onActivityCreated: Detail")
+  }
+
+  override fun onViewStateRestored(savedInstanceState: Bundle?) {
+    super.onViewStateRestored(savedInstanceState)
+    Log.d(TAG, "onViewStateRestored: Detail")
+  }
+
+  override fun onStart() {
+    super.onStart()
+    Log.d(TAG, "onStart: Detail")
+  }
+
+  override fun onResume() {
+    super.onResume()
+    Log.d(TAG, "onResume: Detail")
+  }
+
+  override fun onPause() {
+    super.onPause()
+    Log.d(TAG, "onPause: Detail")
+  }
+
+  override fun onStop() {
+    super.onStop()
+    Log.d(TAG, "onStop: Detail")
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    Log.d(TAG, "onDestroyView: Detail")
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    Log.d(TAG, "onDestroy: Detail")
+  }
+
+  override fun onDetach() {
+    super.onDetach()
+    Log.d(TAG, "onDetach: Detail")
   }
 
   private fun initViews() {

@@ -17,11 +17,13 @@ import com.technocraze.newsappassesment.databinding.FragmentNewsListBinding
 import com.technocraze.newsappassesment.model.Article
 import com.technocraze.newsappassesment.paging.LoaderAdapter
 import com.technocraze.newsappassesment.paging.NewsPaggingAdapter
+import com.technocraze.newsappassesment.repository.Car
 import com.technocraze.newsappassesment.viewmodel.NewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 interface ArticleClickListener {
 
@@ -32,13 +34,20 @@ interface ArticleClickListener {
 @AndroidEntryPoint
 class NewsListFragment : Fragment() {
 
+  val TAG = "Lifecycle"
   private lateinit var binding: FragmentNewsListBinding
   private val viewModel: NewsViewModel by viewModels()
   private lateinit var newsListAdapter: NewsPaggingAdapter
   private lateinit var articleClickListener: ArticleClickListener
+  @Inject
+  lateinit var  car: Car
+  @Inject
+  lateinit var  bmw: Car
+
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
+    Log.d("NewsListFragment", "onAttach: List")
     if (context is ArticleClickListener) {
       articleClickListener = context
     } else {
@@ -46,12 +55,74 @@ class NewsListFragment : Fragment() {
     }
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Log.d(TAG, "onCreate: List")
+  }
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    Log.d(TAG, "onCreateView: List")
+    Log.d(TAG, "NewsListFragment:car ${car.getName()}")
+    Log.d(TAG, "NewsListFragment:bmw ${bmw.getName()}")
     binding = FragmentNewsListBinding.inflate(inflater, container, false)
     initView()
+    // viewModel.retry(0)
     return binding.root
   }
 
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    Log.d(TAG, "onViewCreated: List")
+  }
+
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    Log.d(TAG, "onActivityCreated: List")
+  }
+
+  override fun onViewStateRestored(savedInstanceState: Bundle?) {
+    super.onViewStateRestored(savedInstanceState)
+    Log.d(TAG, "onViewStateRestored: List")
+  }
+
+  override fun onStart() {
+    super.onStart()
+    Log.d(TAG, "onStart: List")
+  }
+
+  override fun onResume() {
+    super.onResume()
+    Log.d(TAG, "onResume: List")
+  }
+
+  override fun onPause() {
+    super.onPause()
+    Log.d(TAG, "onPause: List")
+  }
+
+  override fun onStop() {
+    super.onStop()
+    Log.d(TAG, "onStop: List")
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    Log.d(TAG, "onDestroyView: List")
+  }
+  
+  
+
+  override fun onDestroy() {
+    super.onDestroy()
+    Log.d(TAG, "onDestroy: List")
+  }
+
+  override fun onDetach() {
+    super.onDetach()
+    Log.d(TAG, "onDetach: List")
+  }
+  
+  
   private fun initView() {
     setupNewsRv()
     handleLoadState()
@@ -113,8 +184,8 @@ class NewsListFragment : Fragment() {
       hasFixedSize()
       adapter = newsListAdapter
       adapter = newsListAdapter.withLoadStateHeaderAndFooter(
-        header = LoaderAdapter(),
-        footer = LoaderAdapter()
+        header = LoaderAdapter({newsListAdapter.retry()}),
+        footer = LoaderAdapter({newsListAdapter.retry()})
       )
     }
   }

@@ -6,6 +6,8 @@ import com.technocraze.newsappassesment.model.Article
 
 interface NewsRepository {
 
-  fun getNews(): LiveData<PagingData<Article>>
+  fun getNews(category:String): LiveData<PagingData<Article>>
+
+  suspend fun getFiles(times:Int): String
 
 }

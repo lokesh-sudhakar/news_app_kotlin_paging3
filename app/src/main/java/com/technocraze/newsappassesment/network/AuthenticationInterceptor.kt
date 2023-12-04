@@ -15,7 +15,9 @@ class AuthenticationInterceptor : Interceptor {
     val request = chain.request().newBuilder()
       .header(AUTHORIZATION_HEADER_KEY, BuildConfig.API_KEY)
       .build()
-    return chain.proceed(request)
+
+    val res = chain.proceed(request)
+    return res
   }
 
 }

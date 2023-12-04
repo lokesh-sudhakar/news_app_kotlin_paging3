@@ -2,6 +2,9 @@ package com.technocraze.newsappassesment.paging
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
+import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -41,18 +44,29 @@ class NewsPaggingAdapter(val onItemClick: (Article)->Unit): PagingDataAdapter<Ar
     RecyclerView.ViewHolder(binding.root){
 
     fun bind(article: Article, onItemClick: (Article)->Unit){
+      binding.article = article
+      binding.executePendingBindings()
       with(binding){
         root.setOnClickListener {
           onItemClick(article)
         }
-        titleTv.text = article.title
       }
-      Glide.with(binding.root.context).load(article.urlToImage)
-        .placeholder(R.drawable.placeholder_image1)
-        .error(R.drawable.placeholder_image1)
-        .centerCrop()
-        .into(binding.image);
     }
+
+    companion object{
+      @BindingAdapter("imageUrl")
+      @JvmStatic
+      fun bindImage(view: ImageView, url: String?){
+        Glide.with(view.context).load(url)
+          .placeholder(R.drawable.placeholder_image1)
+          .error(R.drawable.placeholder_image1)
+          .centerCrop()
+          .into(view);
+      }
+    }
+
+
+
 
   }
 }
